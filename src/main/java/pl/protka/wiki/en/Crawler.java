@@ -10,10 +10,17 @@ import java.util.List;
  * Created by gruszek on 11.04.15.
  */
 
-public class Crawler {
+class Crawler {
     public void start() {
 
+        List<String> listOfTiles = new ArrayList<>();
+        listOfTiles.add("Leonhard Euler");
         User user = loginToWikipedia();
+        List<Page> pages = user.queryContent(listOfTiles);
+
+        for(Page page : pages){
+            System.out.print(page.toString());
+        }
 
     }
 
