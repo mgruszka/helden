@@ -7,7 +7,7 @@ public enum CrawledSource {
 
 	public String dbFiled;
 	
-	private CrawledSource(String field) {
+	CrawledSource(String field) {
 		dbFiled = field;
 		}
 }
