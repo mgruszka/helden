@@ -128,9 +128,21 @@ public class DatabaseDriver {
 	}
 
 	
+	//TO DO
+	public int savePerson(PersonEntity person){
+		
+		return 0;
+	}
+	
+	
+	//TO DO
+	public void setCrawled(int personID, CrawledSource source){
+		
+	}
+	
 	
 	//nieaktualne jeszcze
-	public int savePerson(String name, String birthDate, String deathDate,
+	public int savePerson2(String name, String birthDate, String deathDate,
 			int crawled) {
 
 		int id = -1;
