@@ -5,8 +5,11 @@ import pl.protka.db.CrawledSource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static pl.protka.wiki.en.CrawledField.INFOBOX;
 
 /**
  * Created by gruszek on 24.04.15.
@@ -20,6 +23,22 @@ public class InfoboxDataProcessor {
         this.lang = type;
     }
 
+    public String getInfoboxData(Page page) {
+        String s = page.toString();
+        try {
+            List<String> options = INFOBOX.get(lang);
+            s = s.substring(s.indexOf(options.get(0)));
+            s = s.substring(0, s.indexOf("\n}}") + 3).replaceAll("  *", " ").replaceAll("\n\\|", "\n");
+//            System.out.println(s + "\n\n\n");
+            return s;
+        }catch(StringIndexOutOfBoundsException e){
+            // Gotcha!
+            System.err.println("Incorrect page");
+            return null;
+        }
+    }
+
+
     public HashMap<String, String> getPersonData(String infoboxData) {
         HashMap<String, String> params = new HashMap<>();
         Matcher m = Pattern.compile("\\S+ = .+").matcher(infoboxData);
@@ -32,7 +51,7 @@ public class InfoboxDataProcessor {
     }
 
 
-    public String prepareDate(String dateToProcess) {
+    public String prepareDate(String dateToProcess, String result) {
         System.out.println("Processed date: " + dateToProcess);
         try {
             Matcher m = Pattern.compile("\\d+\\|\\d+\\|\\d+").matcher(dateToProcess);
@@ -47,7 +66,10 @@ public class InfoboxDataProcessor {
             // Gotcha!
             System.err.println("None date argument in infobox");
         }
-        return null;
+        if(result != ""){
+            return result;
+        }
+        return dateToProcess;
     }
 
 
@@ -65,5 +87,12 @@ public class InfoboxDataProcessor {
             System.out.println("Empty parameter");
         }
         return places;
+    }
+
+    public String getFieldContent(String key, String result) {
+        if(result != ""){
+            return result;
+        }
+        return key;
     }
 }

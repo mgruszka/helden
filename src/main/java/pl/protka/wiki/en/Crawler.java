@@ -6,6 +6,7 @@ import pl.protka.db.CrawledSource;
 import static pl.protka.wiki.en.CrawledField.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -24,28 +25,32 @@ class Crawler {
     public void start(List<String> listOfTiles){
 
         List<Page> pages = user.queryContent(listOfTiles);
+        InfoboxDataProcessor idt = new InfoboxDataProcessor(lang);
+        HashMap<String, String> params;
 
         for(Page page : pages){
-            String infobox = getInfoboxData(page);
-            System.out.print(infobox);
+            Person person = new Person();
+            String infoboxData = idt.getInfoboxData(page);
+            person.name = page.getTitle();
+            if(infoboxData != null) {
+                params = idt.getPersonData(infoboxData);
+                System.out.print(infoboxData);
+                for (String dateKey : BIRTH_DATE.get(lang))
+                    person.birthDate = idt.prepareDate(params.get(dateKey), person.birthDate);
+                for (String dateKey : DEATH_DATE.get(lang))
+                    person.deathDate = idt.prepareDate(params.get(dateKey), person.deathDate);
+                for (String key : BIRTH_PLACE.get(lang))
+                    person.birthPlace = idt.getFieldContent(params.get(key), person.birthPlace);
+                for (String key : DEATH_PLACE.get(lang))
+                    person.deathPlace = idt.getFieldContent(params.get(key), person.deathPlace);
+                for (String key : FIELDS.get(lang))
+                    person.fields = idt.getFieldContent(params.get(key), person.fields);
+                System.out.print(person);
+            }
         }
 
     }
 
-    private String getInfoboxData(Page page) {
-        String s = page.toString();
-        try {
-            List<String> options = INFOBOX.get(lang);
-            s = s.substring(s.indexOf(options.get(0)));
-            s = s.substring(0, s.indexOf("\n}}") + 3).replaceAll("  *", " ").replaceAll("\n\\|", "\n");
-            System.out.println(s + "\n\n\n");
-            return s;
-        }catch(StringIndexOutOfBoundsException e){
-            // Gotcha!
-            System.err.println("Incorrect page");
-            return null;
-        }
-    }
 
 
     private User loginToWikipedia(CrawledSource lang) throws SourceNotSupportedException {
