@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -128,20 +129,362 @@ public class DatabaseDriver {
 	}
 
 	
-	//TO DO
 	public int savePerson(PersonEntity person){
 		
-		return 0;
+		int id = getPersonID(person.getName());
+		
+		if (id != -1){
+			updatePerson(person);
+		}
+		else{
+			id = insertPerson(person);
+		}	
+		return id;
+	}
+	
+	private void updatePerson(PersonEntity person){
+		
+		int id = -1;
+		try {
+			
+			String query = prepareQueryForUpdate(person);
+			System.out.println("Prepared query to update person " + query);
+			
+			PreparedStatement preparedStatement = conn.prepareStatement(query);
+			preparedStatement.executeUpdate();
+			
+			preparedStatement.close();
+			System.out.println("Successfully updated person with id: " + id);
+		} catch (SQLException ex) {
+			// TODO Auto-generated catch block
+			System.out.println("Unable to update person " + person.getName());
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
 	}
 	
 	
-	//TO DO
+	private int insertPerson(PersonEntity person){
+		
+		int id = -1;
+		try {		
+					
+			String query = prepareQueryForInsert(person);
+			System.out.println("Prepared query to insert person " + query);
+			
+			//"INSERT INTO person (name, birth_date, death_date,crawled) VALUES (?, ?, ?,?)";
+			
+			PreparedStatement preparedStatement = conn.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
+			preparedStatement.execute();
+			ResultSet rs = preparedStatement.getGeneratedKeys();
+						
+			if (rs.next()) {
+				id = rs.getInt(1);
+			}
+			preparedStatement.close();
+			System.out.println("Successfully added person with id: "+ id);
+		} catch (SQLException ex) {
+			// TODO Auto-generated catch block
+			System.out.println("Unable to save Person " + person.getName());
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		return id;
+	}
+	
+	private String prepareQueryForUpdate(PersonEntity person){
+		
+		StringBuilder sb = new StringBuilder();		
+		
+		Map<String, String> map = getParamsToUpdate(person);
+		sb.append("UPDATE person set ");
+		for (String field : map.keySet()){
+			sb.append(field);
+			sb.append(" = ");
+			sb.append(map.get(field));
+			sb.append(",");
+		}
+		sb.setLength(sb.length() - 1);
+		sb.append(" where ID = ");
+		sb.append(person.getID());
+		
+		return sb.toString();
+		
+	}
+
+	private String prepareQueryForInsert(PersonEntity person){
+		StringBuilder sb = new StringBuilder();		
+		
+		Map<String, String> map = getParamsToUpdate(person);
+		sb.append("INSERT INTO person (");
+		for (String field : map.keySet()){
+			sb.append(field);
+			sb.append(",");			
+		}
+		sb.setLength(sb.length() - 1);
+		sb.append(") VALUES (");
+		for (String field : map.keySet()){
+			sb.append(map.get(field));
+			sb.append(",");			
+		}
+		sb.setLength(sb.length() - 1);
+		sb.append(")");
+		
+		return sb.toString();
+	}
+	
+	
+	//here could be checking of "better" parameter - if it's worse won't append to map
+	private Map<String,String> getParamsToUpdate(PersonEntity person){
+		
+		Map<String, String> map = new HashMap<String,String>();		
+		
+		if (person.getName() != null)
+			map.put("name",person.getName());
+		
+		if (person.getBirthDate() != null)
+			map.put("birth_date",person.getBirthDate());
+		
+		if (person.getName() != null)
+			map.put("death_date",person.getDeathDate());
+		
+		if (person.getName() != null)
+			map.put("birth_place",person.getBirthPlace());
+		
+		if (person.getName() != null)
+			map.put("death_place",person.getDeathPlace());
+				
+		if (person.getName() != null)
+			map.put("fields",person.getFields());
+		
+		if (person.getName() != null)
+			map.put("brit_url",person.getBirthURL());
+		
+		return map;
+	}
+	
+	
 	public void setCrawled(int personID, CrawledSource source){
+		
+		
+		String sql = "UPDATE person set " + source.dbFiled + " = 1 where ID = ?";
+		PreparedStatement preparedStatement;
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, personID);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			preparedStatement.close();
+			System.out.println("Successfully set " + source.dbFiled + " person with id: " + personID);
+		} catch (SQLException ex) {
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		
+		
+	}
+	
+
+	public void saveCountryFromBox(int personID, String countryName){
+		saveForPerson(personID,country_box_table,countryName);
+	}
+	
+	public void saveCountryFromText(int personID, String countryName){
+		saveForPerson(personID,country_text_table,countryName);
+	}
+	
+	public void saveCityFromBox(int personID, String cityName) {
+		saveForPerson(personID,city_box_table,cityName);
+	}
+	
+	public void saveCityFromText(int personID, String cityName) {
+		saveForPerson(personID,city_text_table,cityName);
+	}
+	
+	public void saveUniFromBox(int personID, String university) {
+		saveForPerson(personID,uni_box_table,university);
+	}
+	
+	public void saveUniFromText(int personID, String university) {
+		saveForPerson(personID,uni_text_table,university);
+	}
+		
+	
+	private void saveForPerson(int personID, String tableName, String value) {
+
+		try {
+			String sql = "INSERT INTO " + tableName
+					+ " (PERSON_ID, name)"
+					+ "VALUES (?, ?)";
+			
+			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, personID);
+			preparedStatement.setString(2, value);
+			System.out.println("Executing query: " + preparedStatement.toString());
+			
+			if (valuesAmount(personID, tableName, value) == 0){
+				preparedStatement.execute();	
+				preparedStatement.close();
+				System.out.println("Successfully added: " + value + " to table: " + tableName);
+			}
+			else{
+				System.out.println("Value: " + value + " already exists in table: " + tableName);
+			}
+
+		} catch (SQLException ex) {
+			// TODO Auto-generated catch block
+			System.out.println("Unable to saved: " + value + " to table: " + tableName);
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+	}
+	
+	private int valuesAmount(int personID, String tableName, String value) throws SQLException{
+		String sql = "SELECT PERSON_ID,name from ? where PERSON_ID = ? and name = ?";
+		PreparedStatement preparedStatement;
+		int count = 0;
+		preparedStatement = conn.prepareStatement(sql);
+		preparedStatement.setString(1, tableName);	
+		preparedStatement.setInt(2, personID);
+		preparedStatement.setString(3, value);	
+		System.out.println("Executing checking query: " + preparedStatement.toString());
+		ResultSet resultSet = preparedStatement.executeQuery();
+		
+		while (resultSet.next()) {
+			count ++;
+		}
+		preparedStatement.close();
+		
+		return count;
+	}
+
+	
+	public void saveRelationFromBox(int personID, int personID2)  {
+		saveRelation(personID,personID2,relation_box_table);
+	}
+	
+	public void saveRelationFromText(int personID, int personID2)  {
+		saveRelation(personID,personID2,relation_text_table);
+	}
+	
+	private void saveRelation(int personID, int personID2, String tableName) {
+
+		try {
+			
+			if (relationExists(personID,personID2,tableName)){
+				System.out.println("Relation between: " + personID + " and " + personID2 + " already exists in table: " + tableName);
+			}
+			else{
+				String sql = "INSERT INTO " + tableName
+						+ " (PERSON_ID, PERSON_ID2) VALUES (?, ?)";
+				PreparedStatement preparedStatement = conn.prepareStatement(sql);
+				preparedStatement.setInt(1, personID);
+				preparedStatement.setInt(2, personID2);
+				System.out.println("Executing query: " + preparedStatement.toString());
+				preparedStatement.execute();
+				preparedStatement.close();
+				System.out.println("Successfully added relation: " + personID
+						+ " with " + personID2 + " to table " + tableName);
+			}
+		} catch (SQLException ex) {
+			// TODO Auto-generated catch block
+			System.out.println("Unable to save relation: " + personID
+					+ " with " + personID2 + " to table " + tableName);
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+	}
+	
+	private boolean relationExists(int personID, int personID2, String tableName) throws SQLException{
+		
+		String sql = "SELECT PERSON_ID,PERSON_ID2 from ? where PERSON_ID = ? and PERSON_ID2 = ?";
+		PreparedStatement preparedStatement;
+		int count = 0;
+		preparedStatement = conn.prepareStatement(sql);
+		preparedStatement.setString(1, tableName);	
+		preparedStatement.setInt(2, personID);
+		preparedStatement.setInt(3, personID2);	
+		System.out.println("Executing checking query: " + preparedStatement.toString());
+		ResultSet resultSet = preparedStatement.executeQuery();		
+		return resultSet.next();
 		
 	}
 	
 	
-	//nieaktualne jeszcze
+	
+	public Map<Integer,String> getPeople() {
+
+		String sql = "SELECT ID,name from person";
+		PreparedStatement preparedStatement;
+		Map<Integer,String> people = new LinkedHashMap<Integer,String>();
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				int ID = resultSet.getInt("ID");
+				String name = resultSet.getString("name");
+				people.put(ID,name);
+			}
+			preparedStatement.close();
+		} catch (SQLException ex) {
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		return people;
+	}
+	
+	
+/*	public List<Relation> getRelations(){
+		
+		List<Relation> relations = new ArrayList<Relation>();
+		String sql = "SELECT PERSON_ID,PERSON_ID2 from relations";
+		PreparedStatement preparedStatement;
+		
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				int ID = resultSet.getInt("PERSON_ID");
+				int ID2 = resultSet.getInt("PERSON_ID2");
+				Relation r = new Relation();
+				r.setID1(ID);
+				r.setID2(ID2);
+				relations.add(r);
+			}
+			preparedStatement.close();
+		} catch (SQLException ex) {
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		
+		return relations;
+	}*/
+	
+	
+
+	/*
+	 * public void listPeople(){ while (resultSet.next()) { String user =
+	 * resultSet.getString("myuser"); String website =
+	 * resultSet.getString("webpage"); String summary =
+	 * resultSet.getString("summary"); Date date = resultSet.getDate("datum");
+	 * String comment = resultSet.getString("comments");
+	 * System.out.println("User: " + user); System.out.println("Website: " +
+	 * website); System.out.println("Summary: " + summary);
+	 * System.out.println("Date: " + date); System.out.println("Comment: " +
+	 * comment); } }
+	 */
+
+
+/*	
+	//nieaktualne 
 	public int savePerson2(String name, String birthDate, String deathDate,
 			int crawled) {
 
@@ -227,159 +570,7 @@ public class DatabaseDriver {
 		}
 		return id;
 
-	}
-
-	
-	public void saveCountryFromBox(int personID, String countryName){
-		saveForPerson(personID,country_box_table,countryName);
-	}
-	
-	public void saveCountryFromText(int personID, String countryName){
-		saveForPerson(personID,country_text_table,countryName);
-	}
-	
-	public void saveCityFromBox(int personID, String cityName) {
-		saveForPerson(personID,city_box_table,cityName);
-	}
-	
-	public void saveCityFromText(int personID, String cityName) {
-		saveForPerson(personID,city_text_table,cityName);
-	}
-	
-	public void saveUniFromBox(int personID, String university) {
-		saveForPerson(personID,uni_box_table,university);
-	}
-	
-	public void saveUniFromText(int personID, String university) {
-		saveForPerson(personID,uni_text_table,university);
-	}
-		
-	
-	private void saveForPerson(int personID, String tableName, String value) {
-
-		try {
-			String sql = "INSERT INTO " + tableName
-					+ " (PERSON_ID, name)"
-					+ "VALUES (?, ?)";
-			
-			PreparedStatement preparedStatement = conn.prepareStatement(sql);
-			preparedStatement.setInt(1, personID);
-			preparedStatement.setString(2, value);
-			System.out.println("Executing query: " + preparedStatement.toString());
-			preparedStatement.execute();	
-			preparedStatement.close();
-			System.out.println("Successfully added: " + value + " to table: " + tableName);
-
-		} catch (SQLException ex) {
-			// TODO Auto-generated catch block
-			System.out.println("Unable to saved: " + value + " to table: " + tableName);
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
-		}
-	}
-
-	
-	
-	public void saveRelationFromBox(int personID, int personID2)  {
-		saveRelation(personID,personID2,relation_box_table);
-	}
-	
-	public void saveRelationFromText(int personID, int personID2)  {
-		saveRelation(personID,personID2,relation_text_table);
-	}
-	
-	private void saveRelation(int personID, int personID2, String tableName) {
-
-		try {
-			String sql = "INSERT INTO " + tableName
-					+ " (PERSON_ID, PERSON_ID2) VALUES (?, ?)";
-			PreparedStatement preparedStatement = conn.prepareStatement(sql);
-			preparedStatement.setInt(1, personID);
-			preparedStatement.setInt(2, personID2);
-			System.out.println("Executing query: " + preparedStatement.toString());
-			preparedStatement.execute();
-			preparedStatement.close();
-			System.out.println("Successfully added relation: " + personID
-					+ " with " + personID2 + " to table " + tableName);
-
-		} catch (SQLException ex) {
-			// TODO Auto-generated catch block
-			System.out.println("Unable to save relation: " + personID
-					+ " with " + personID2 + " to table " + tableName);
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
-		}
-	}
-	
-	public Map<Integer,String> getPeople() {
-
-		String sql = "SELECT ID,name from person";
-		PreparedStatement preparedStatement;
-		Map<Integer,String> people = new LinkedHashMap<Integer,String>();
-		try {
-			preparedStatement = conn.prepareStatement(sql);
-			ResultSet resultSet = preparedStatement.executeQuery();
-
-			while (resultSet.next()) {
-				int ID = resultSet.getInt("ID");
-				String name = resultSet.getString("name");
-				people.put(ID,name);
-			}
-			preparedStatement.close();
-		} catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
-		}
-		return people;
-	}
-	
-	
-/*	public List<Relation> getRelations(){
-		
-		List<Relation> relations = new ArrayList<Relation>();
-		String sql = "SELECT PERSON_ID,PERSON_ID2 from relations";
-		PreparedStatement preparedStatement;
-		
-		try {
-			preparedStatement = conn.prepareStatement(sql);
-			ResultSet resultSet = preparedStatement.executeQuery();
-
-			while (resultSet.next()) {
-				int ID = resultSet.getInt("PERSON_ID");
-				int ID2 = resultSet.getInt("PERSON_ID2");
-				Relation r = new Relation();
-				r.setID1(ID);
-				r.setID2(ID2);
-				relations.add(r);
-			}
-			preparedStatement.close();
-		} catch (SQLException ex) {
-			System.out.println("SQLException: " + ex.getMessage());
-			System.out.println("SQLState: " + ex.getSQLState());
-			System.out.println("VendorError: " + ex.getErrorCode());
-		}
-		
-		return relations;
 	}*/
-	
-	
-
-	/*
-	 * public void listPeople(){ while (resultSet.next()) { String user =
-	 * resultSet.getString("myuser"); String website =
-	 * resultSet.getString("webpage"); String summary =
-	 * resultSet.getString("summary"); Date date = resultSet.getDate("datum");
-	 * String comment = resultSet.getString("comments");
-	 * System.out.println("User: " + user); System.out.println("Website: " +
-	 * website); System.out.println("Summary: " + summary);
-	 * System.out.println("Date: " + date); System.out.println("Comment: " +
-	 * comment); } }
-	 */
-
-
 
 }
 
