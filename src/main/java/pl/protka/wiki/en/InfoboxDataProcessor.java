@@ -1,6 +1,7 @@
 package pl.protka.wiki.en;
 
 import info.bliki.api.Page;
+import info.bliki.api.User;
 import pl.protka.db.CrawledSource;
 
 import java.util.ArrayList;
@@ -95,4 +96,5 @@ public class InfoboxDataProcessor {
         }
         return key;
     }
+
 }
