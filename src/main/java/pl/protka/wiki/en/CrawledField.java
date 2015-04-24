@@ -11,6 +11,7 @@ import java.util.List;
  */
 
 public enum CrawledField {
+    INFOBOX(Arrays.asList("{{Infobox"), Arrays.asList("{{Biogram")),
     NAME(Arrays.asList("name"), Arrays.asList("imię", "imie")),
     BIRTH_DATE(Arrays.asList("birth date"), Arrays.asList("data urodzenia")),
     BIRTH_PLACE(Arrays.asList("birth place"), Arrays.asList("miejsce urodzenia"));
