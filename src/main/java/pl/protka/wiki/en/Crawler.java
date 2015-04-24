@@ -88,7 +88,6 @@ class Crawler {
 
         List<Page> listOfLinks = user.queryContent(links);
         String pageType;
-        // TODO: change to enum usage
         for (Page p : listOfLinks) {
             pageType = determinePageType(p);
             switch (pageType) {
@@ -116,6 +115,7 @@ class Crawler {
     }
 
     public String determinePageType(Page page){
+        // TODO: change to enum usage
         String s = page.toString();
         try {
             s = s.substring(s.indexOf("{{Infobox"));
