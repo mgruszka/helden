@@ -4,9 +4,7 @@ import info.bliki.api.Page;
 import info.bliki.api.User;
 import pl.protka.db.CrawledSource;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -94,7 +92,24 @@ public class InfoboxDataProcessor {
         if(result != ""){
             return result;
         }
+        key = key.replace("[", "");
+        key = key.replace("]", "");
         return key;
     }
 
+    public Set<String> getFieldContentList(String s) {
+        Set<String> list = new LinkedHashSet<>();
+
+        try {
+            Matcher m = Pattern.compile("\\[\\[(.*?)\\]\\]").matcher(s);
+            while (m.find()) {
+                list.add(m.group(1).split("\\|")[0].split("#")[0]);
+            }
+        } catch (NullPointerException e) {
+            // Gotcha!
+            // this catch was discussed, it should stay here
+            System.out.println("Empty parameter");
+        }
+        return list;
+    }
 }

@@ -45,6 +45,14 @@ class Crawler {
                     person.deathPlace = idt.getFieldContent(params.get(key), person.deathPlace);
                 for (String key : FIELDS.get(lang))
                     person.fields = idt.getFieldContent(params.get(key), person.fields);
+                for (String key : INSTITUTIONS.get(lang))
+                    person.institutionsInf.addAll(idt.getFieldContentList(params.get(key)));
+                for (String key : CITIES.get(lang))
+                    person.citiesInf.addAll(idt.getFieldContentList(params.get(key)));
+                for (String key : COUNTRIES.get(lang))
+                    person.countriesInf.addAll(idt.getFieldContentList(params.get(key)));
+                for (String key : RELATION.get(lang))
+                    person.countriesInf.addAll(idt.getFieldContentList(params.get(key)));
                 person = getInfoboxLinks(infoboxData, person);
             }
             person = getPageLinks(page.toString(), person);
@@ -58,6 +66,7 @@ class Crawler {
         person.citiesInf = map.get("city");
         person.countriesInf = map.get("country");
         person.institutionsInf = map.get("inst");
+        person.relatedPeopleInf = map.get("ppl");
         return person;
     }
 
@@ -66,6 +75,7 @@ class Crawler {
         person.citiesTxt = map.get("city");
         person.countriesTxt = map.get("country");
         person.institutionsTxt = map.get("inst");
+        person.relatedPeopleTxt = map.get("ppl");
         return person;
     }
 
@@ -74,6 +84,7 @@ class Crawler {
         Set<String> cities = new LinkedHashSet<>();
         Set<String> countries = new LinkedHashSet<>();
         Set<String> institutions = new LinkedHashSet<>();
+        Set<String> people = new LinkedHashSet<>();
 
         try {
             Matcher m = Pattern.compile("\\[\\[(.*?)\\]\\]").matcher(page);
@@ -103,6 +114,10 @@ class Crawler {
                     institutions.add(p.getTitle());
                     System.out.println("added university: " + p.getTitle());
                     break;
+                case "person":
+                    people.add(p.getTitle());
+                    System.out.println("added person: " + p.getTitle());
+                    break;
                 default:
                     System.out.println("Just a link: " + p.getTitle());
             }
@@ -111,24 +126,31 @@ class Crawler {
         res.put("city", cities);
         res.put("country", countries);
         res.put("inst", institutions);
+        res.put("ppl", people);
         return res;
     }
 
     public String determinePageType(Page page){
-        // TODO: change to enum usage
         String s = page.toString();
         try {
-            s = s.substring(s.indexOf("{{Infobox"));
-            s = s.substring(0, 50).toLowerCase();
-            if(s.contains("university")){
-                return "university";
-            }else if(s.contains("country")){
-                return "country";
-            }else if(s.contains("town") || s.contains("city") || s.contains("village")){
-                return "city";
-            }else{
-                return "link";
+            if (s.contains(PERSON.get(lang).get(0))){
+                return "person";
             }
+            if (page.getTitle().contains(INSTITUTIONS_TXT.get(lang).get(0))){
+                return "university";
+            }
+            s = s.substring(s.indexOf(INFOBOX.get(lang).get(0)));
+            s = s.substring(0, 50).toLowerCase();
+            for (String key : INSTITUTIONS_TXT.get(lang))
+                if(s.contains(key))
+                    return "university";
+            for (String key : COUNTRIES_TXT.get(lang))
+                if(s.contains(key))
+                    return "country";
+            for (String key : CITIES_TXT.get(lang))
+                if(s.contains(key))
+                    return "city";
+            return "link";
         }catch(StringIndexOutOfBoundsException e){
             // Gotcha!
             System.err.println("Page without infobox");

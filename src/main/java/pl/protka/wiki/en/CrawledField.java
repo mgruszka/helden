@@ -12,16 +12,19 @@ import java.util.List;
 
 public enum CrawledField {
     INFOBOX(Arrays.asList("{{Infobox"), Arrays.asList("{{Biogram")),
-    NAME(Arrays.asList("name"), Arrays.asList("imię", "imie")),
-    FIELDS(Arrays.asList("field"), Arrays.asList("imię", "imie")),
-    DEATH_DATE(Arrays.asList("death_date"), Arrays.asList("data smierci")),
-    DEATH_PLACE(Arrays.asList("death_date"), Arrays.asList("data smierci")),
-    BIRTH_DATE(Arrays.asList("birth_date"), Arrays.asList("data urodzenia")),
-    BIRTH_PLACE(Arrays.asList("birth_place"), Arrays.asList("miejsce urodzenia")),
-    INSTITUTIONS(Arrays.asList("work_institutions", "alma_mater"), Arrays.asList("miejsce urodzenia")),
-    CITIES(Arrays.asList("birth_place", "death_place", "residence"), Arrays.asList("miejsce urodzenia")),
-    COUNTRIES(Arrays.asList("birth_place", "death_place", "residence"), Arrays.asList("miejsce urodzenia")),
-    RELATION(Arrays.asList("doctoral_advisor", "doctoral_students", "notable_students"), Arrays.asList("miejsce urodzenia"));
+    PERSON(Arrays.asList("{{Persondata"), Arrays.asList("{{Biogram")),
+    FIELDS(Arrays.asList("field"), Arrays.asList("")),
+    DEATH_DATE(Arrays.asList("death_date"), Arrays.asList("")),
+    DEATH_PLACE(Arrays.asList("death_place"), Arrays.asList("")),
+    BIRTH_DATE(Arrays.asList("birth_date"), Arrays.asList("")),
+    BIRTH_PLACE(Arrays.asList("birth_place"), Arrays.asList("")),
+    INSTITUTIONS(Arrays.asList("work_institutions", "alma_mater"), Arrays.asList("")),
+    CITIES(Arrays.asList("birth_place", "death_place", "residence"), Arrays.asList("")),
+    COUNTRIES(Arrays.asList("birth_place", "death_place", "residence"), Arrays.asList("")),
+    INSTITUTIONS_TXT(Arrays.asList("Academy", "university"), Arrays.asList("")),
+    CITIES_TXT(Arrays.asList("town", "city", "village", "state"), Arrays.asList("")),
+    COUNTRIES_TXT(Arrays.asList("country"), Arrays.asList("")),
+    RELATION(Arrays.asList("doctoral_advisor", "doctoral_students", "notable_students"), Arrays.asList(""));
 
     private final List<String> eng;
     private final List<String> pl;
