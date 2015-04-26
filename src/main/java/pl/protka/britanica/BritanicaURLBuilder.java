@@ -21,7 +21,7 @@ public class BritanicaURLBuilder {
 			String peparedQueryURL = queryURL + name.trim().replaceAll(" ", "+");			
 			String urlData = http.doGetMethod(peparedQueryURL);
 			String sufix = parseURLsufix(urlData);
-			url = "www.britannica.com" + sufix;
+			url = "http://www.britannica.com" + sufix;
 			
 		} catch (JSONException e) {
 			System.out.println("Unable to obtain URL sufix for: " + name);
@@ -41,13 +41,6 @@ public class BritanicaURLBuilder {
 		String ala = fieldsJson.getString("url");
 		return ala;
 	}
-	
-	
-	/*	public static void main(String[] args) {
-		BritanicaURLBuilder brit = new BritanicaURLBuilder();
-		String url = brit.getBritanicaURL("Leonardo+Da+Vinci");
-		System.out.println(url);
-	}*/
 		
 	
 }
