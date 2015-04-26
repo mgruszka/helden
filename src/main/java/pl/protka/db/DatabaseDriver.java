@@ -70,14 +70,21 @@ public class DatabaseDriver {
 
 		DatabaseDriver dbdriver = DatabaseDriver.getInstance();
 
-		//dbdriver.savePerson("gruszka-pajac3", "2000-2-14", null,1);
+		PersonEntity pe = new PersonEntity();
+		pe.setName("Leonardo_da_Vinci");
+		pe.setBirthDate("2015-03-02");
+		pe.setDeathDate("2015-06-02");
+		pe.setBirthPlace("Krakow");
+		pe.setDeathPlace("Sachy");
+		pe.setFields("Economy, mathemathics");
 		
-		//Map<Integer,String> lista = dbdriver.getPeople();		
-		//System.out.println(lista);
+		int id = dbdriver.savePerson(pe);
+		System.out.println("ID:" + id);		
+		Map<Integer,String> lista = dbdriver.getPeople();		
+		System.out.println(lista);
 		
-		// System.out.println(dbdriver.getPersonID("gruszka-pajac2"));
 		
-		dbdriver.saveUniFromText(2, "university2");
+		//dbdriver.saveUniFromText(2, "university2");
 		
 		dbdriver.close();
 
@@ -134,6 +141,7 @@ public class DatabaseDriver {
 		int id = getPersonID(person.getName());
 		
 		if (id != -1){
+			person.setID(id);
 			updatePerson(person);
 		}
 		else{
@@ -144,7 +152,6 @@ public class DatabaseDriver {
 	
 	private void updatePerson(PersonEntity person){
 		
-		int id = -1;
 		try {
 			
 			String query = prepareQueryForUpdate(person);
@@ -154,7 +161,7 @@ public class DatabaseDriver {
 			preparedStatement.executeUpdate();
 			
 			preparedStatement.close();
-			System.out.println("Successfully updated person with id: " + id);
+			System.out.println("Successfully updated person : " + person.getName());
 		} catch (SQLException ex) {
 			// TODO Auto-generated catch block
 			System.out.println("Unable to update person " + person.getName());
@@ -202,9 +209,9 @@ public class DatabaseDriver {
 		sb.append("UPDATE person set ");
 		for (String field : map.keySet()){
 			sb.append(field);
-			sb.append(" = ");
+			sb.append(" = '");
 			sb.append(map.get(field));
-			sb.append(",");
+			sb.append("',");
 		}
 		sb.setLength(sb.length() - 1);
 		sb.append(" where ID = ");
@@ -226,8 +233,9 @@ public class DatabaseDriver {
 		sb.setLength(sb.length() - 1);
 		sb.append(") VALUES (");
 		for (String field : map.keySet()){
+			sb.append("'");
 			sb.append(map.get(field));
-			sb.append(",");			
+			sb.append("',");			
 		}
 		sb.setLength(sb.length() - 1);
 		sb.append(")");
@@ -247,19 +255,19 @@ public class DatabaseDriver {
 		if (person.getBirthDate() != null)
 			map.put("birth_date",person.getBirthDate());
 		
-		if (person.getName() != null)
+		if (person.getDeathDate() != null)
 			map.put("death_date",person.getDeathDate());
 		
-		if (person.getName() != null)
+		if (person.getBirthPlace() != null)
 			map.put("birth_place",person.getBirthPlace());
 		
-		if (person.getName() != null)
+		if (person.getDeathPlace() != null)
 			map.put("death_place",person.getDeathPlace());
 				
-		if (person.getName() != null)
+		if (person.getFields() != null)
 			map.put("fields",person.getFields());
 		
-		if (person.getName() != null)
+		if (person.getBirthURL() != null)
 			map.put("brit_url",person.getBirthURL());
 		
 		return map;
