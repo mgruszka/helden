@@ -6,8 +6,6 @@ import pl.protka.db.CrawledSource;
 import static pl.protka.wiki.en.CrawledField.*;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by gruszek on 11.04.15.
@@ -34,7 +32,6 @@ class Crawler {
             person.name = page.getTitle();
             if(infoboxData != null) {
                 params = idt.getPersonData(infoboxData);
-                System.out.print(infoboxData);
                 for (String dateKey : BIRTH_DATE.get(lang))
                     person.birthDate = idt.prepareDate(params.get(dateKey), person.birthDate);
                 for (String dateKey : DEATH_DATE.get(lang))
@@ -56,13 +53,15 @@ class Crawler {
                 person = getInfoboxLinks(infoboxData, person);
             }
             person = getPageLinks(page.toString(), person);
+            savePerson(person);
             System.out.print(person);
         }
 
     }
 
     private Person getInfoboxLinks(String page, Person person) {
-        HashMap<String, Set> map = getLinks(page);
+        PageProcessor pp = new PageProcessor(user, lang);
+        HashMap<String, Set> map = pp.getLinks(page);
         person.citiesInf = map.get("city");
         person.countriesInf = map.get("country");
         person.institutionsInf = map.get("inst");
@@ -71,91 +70,13 @@ class Crawler {
     }
 
     private Person getPageLinks(String page, Person person) {
-        HashMap<String, Set> map = getLinks(page);
+        PageProcessor pp = new PageProcessor(user, lang);
+        HashMap<String, Set> map = pp.getLinks(page);
         person.citiesTxt = map.get("city");
         person.countriesTxt = map.get("country");
         person.institutionsTxt = map.get("inst");
         person.relatedPeopleTxt = map.get("ppl");
         return person;
-    }
-
-    public HashMap<String, Set> getLinks(String page) {
-        ArrayList<String> links = new ArrayList<>();
-        Set<String> cities = new LinkedHashSet<>();
-        Set<String> countries = new LinkedHashSet<>();
-        Set<String> institutions = new LinkedHashSet<>();
-        Set<String> people = new LinkedHashSet<>();
-
-        try {
-            Matcher m = Pattern.compile("\\[\\[(.*?)\\]\\]").matcher(page);
-            while (m.find()) {
-                links.add(m.group(1).split("\\|")[0]);
-            }
-        } catch (NullPointerException e) {
-            // Gotcha!
-            // its thrown when page has no links
-            System.out.println("No links at page");
-        }
-
-        List<Page> listOfLinks = user.queryContent(links);
-        String pageType;
-        for (Page p : listOfLinks) {
-            pageType = determinePageType(p);
-            switch (pageType) {
-                case "city":
-                    cities.add(p.getTitle());
-                    System.out.println("added city: " + p.getTitle());
-                    break;
-                case "country":
-                    countries.add(p.getTitle());
-                    System.out.println("added country: " + p.getTitle());
-                    break;
-                case "university":
-                    institutions.add(p.getTitle());
-                    System.out.println("added university: " + p.getTitle());
-                    break;
-                case "person":
-                    people.add(p.getTitle());
-                    System.out.println("added person: " + p.getTitle());
-                    break;
-                default:
-                    System.out.println("Just a link: " + p.getTitle());
-            }
-        }
-        HashMap<String, Set> res = new HashMap<>();
-        res.put("city", cities);
-        res.put("country", countries);
-        res.put("inst", institutions);
-        res.put("ppl", people);
-        return res;
-    }
-
-    public String determinePageType(Page page){
-        String s = page.toString();
-        try {
-            if (s.contains(PERSON.get(lang).get(0))){
-                return "person";
-            }
-            if (page.getTitle().contains(INSTITUTIONS_TXT.get(lang).get(0))){
-                return "university";
-            }
-            s = s.substring(s.indexOf(INFOBOX.get(lang).get(0)));
-            s = s.substring(0, 50).toLowerCase();
-            for (String key : INSTITUTIONS_TXT.get(lang))
-                if(s.contains(key))
-                    return "university";
-            for (String key : COUNTRIES_TXT.get(lang))
-                if(s.contains(key))
-                    return "country";
-            for (String key : CITIES_TXT.get(lang))
-                if(s.contains(key))
-                    return "city";
-            return "link";
-        }catch(StringIndexOutOfBoundsException e){
-            // Gotcha!
-            System.err.println("Page without infobox");
-            return "link";
-        }
     }
 
     private User loginToWikipedia(CrawledSource lang) throws SourceNotSupportedException {
@@ -171,6 +92,10 @@ class Crawler {
         User user = new User("", "", apiUrl);
         user.login();
         return user;
+    }
+
+    private void savePerson(Person person){
+
     }
 
 }

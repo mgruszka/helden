@@ -15,7 +15,8 @@ public class Main {
 
         System.out.println("Starting crawler");
         List<String> listOfTiles = new ArrayList<>();
-        listOfTiles.add("Leonhard Euler");
+//        listOfTiles.add("Leonhard Euler");
+        listOfTiles.add("Jakob Emanuel Handmann");
         try {
             Crawler crawler = new Crawler(CrawledSource.WIKIENG);
             crawler.start(listOfTiles);
