@@ -408,13 +408,12 @@ public class DatabaseDriver {
 	
 	private boolean relationExists(int personID, int personID2, String tableName) throws SQLException{
 		
-		String sql = "SELECT PERSON_ID,PERSON_ID2 from ? where PERSON_ID = ? and PERSON_ID2 = ?";
+		String sql = "SELECT PERSON_ID,PERSON_ID2 from " + tableName + " where PERSON_ID = ? and PERSON_ID2 = ?";
 		PreparedStatement preparedStatement;
 		int count = 0;
 		preparedStatement = conn.prepareStatement(sql);
-		preparedStatement.setString(1, tableName);	
-		preparedStatement.setInt(2, personID);
-		preparedStatement.setInt(3, personID2);	
+		preparedStatement.setInt(1, personID);
+		preparedStatement.setInt(2, personID2);	
 		System.out.println("Executing checking query: " + preparedStatement.toString());
 		ResultSet resultSet = preparedStatement.executeQuery();		
 		return resultSet.next();
