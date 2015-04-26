@@ -282,7 +282,7 @@ public class DatabaseDriver {
 		try {
 			preparedStatement = conn.prepareStatement(sql);
 			preparedStatement.setInt(1, personID);
-			ResultSet resultSet = preparedStatement.executeQuery();
+			preparedStatement.executeUpdate();
 			preparedStatement.close();
 			System.out.println("Successfully set " + source.dbFiled + " person with id: " + personID);
 		} catch (SQLException ex) {
@@ -465,7 +465,6 @@ public class DatabaseDriver {
 				relations.add(r);
 			}
 			preparedStatement.close();
-		} catch (SQLException ex) {
 			System.out.println("SQLException: " + ex.getMessage());
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
