@@ -1,9 +1,9 @@
 package pl.protka.db;
 
 public enum CrawledSource {
-	WIKIENG("crawled_wiki_eng"), 
-	WIKIPL("crawled_wiki_pl"), 
-	BRITANICA("crawled_brit");
+	WIKIENG("crowled_wiki_eng"), 
+	WIKIPL("crowled_wiki_pl"), 
+	BRITANICA("crowled_brit");
 
 	public String dbFiled;
 	
