@@ -50,6 +50,13 @@
             <artifactId>bliki-addons</artifactId>
             <version>3.0.17</version>
         </dependency>
+        
+        <dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20141113</version>
+		</dependency>
+        
     </dependencies>
 
 </project>
