@@ -351,13 +351,12 @@ public class DatabaseDriver {
 	}
 	
 	private int valuesAmount(int personID, String tableName, String value) throws SQLException{
-		String sql = "SELECT PERSON_ID,name from ? where PERSON_ID = ? and name = ?";
+		String sql = "SELECT PERSON_ID,name from " + tableName + " where PERSON_ID = ? and name = ?";
 		PreparedStatement preparedStatement;
 		int count = 0;
 		preparedStatement = conn.prepareStatement(sql);
-		preparedStatement.setString(1, tableName);	
-		preparedStatement.setInt(2, personID);
-		preparedStatement.setString(3, value);	
+		preparedStatement.setInt(1, personID);
+		preparedStatement.setString(2, value);	
 		System.out.println("Executing checking query: " + preparedStatement.toString());
 		ResultSet resultSet = preparedStatement.executeQuery();
 		
