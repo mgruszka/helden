@@ -1,6 +1,5 @@
 package pl.protka.wiki.en;
 
-import info.bliki.api.Connector;
 import info.bliki.api.Page;
 import info.bliki.api.User;
 import pl.protka.db.CrawledSource;
