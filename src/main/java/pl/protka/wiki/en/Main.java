@@ -15,10 +15,9 @@ public class Main {
 
         System.out.println("Starting crawler");
         List<String> listOfTiles = new ArrayList<>();
-//        listOfTiles.add("Leonhard Euler");
-        listOfTiles.add("Jakob Emanuel Handmann");
+        listOfTiles.add("Albert Einstein");
         try {
-            Crawler crawler = new Crawler(CrawledSource.WIKIENG);
+            Crawler crawler = new Crawler(CrawledSource.WIKIPL);
             crawler.start(listOfTiles);
         } catch (SourceNotSupportedException e) {
             // Gotcha!

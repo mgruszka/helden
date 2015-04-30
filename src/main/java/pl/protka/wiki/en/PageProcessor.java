@@ -1,5 +1,6 @@
 package pl.protka.wiki.en;
 
+import info.bliki.api.Connector;
 import info.bliki.api.Page;
 import info.bliki.api.User;
 import pl.protka.db.CrawledSource;
@@ -49,23 +50,23 @@ public class PageProcessor {
             pageType = determinePageType(p);
             switch (pageType) {
                 case "city":
-                    cities.add(p.getTitle());
-                    System.out.println("added city: " + p.getTitle());
+                    cities.add(translateToEnglish(p.getTitle()));
+                    System.out.println("added city: " + translateToEnglish(p.getTitle()));
                     break;
                 case "country":
-                    countries.add(p.getTitle());
-                    System.out.println("added country: " + p.getTitle());
+                    countries.add(translateToEnglish(p.getTitle()));
+                    System.out.println("added country: " + translateToEnglish(p.getTitle()));
                     break;
                 case "university":
-                    institutions.add(p.getTitle());
-                    System.out.println("added university: " + p.getTitle());
+                    institutions.add(translateToEnglish(p.getTitle()));
+                    System.out.println("added university: " + translateToEnglish(p.getTitle()));
                     break;
                 case "person":
-                    people.add(p.getTitle());
-                    System.out.println("added person: " + p.getTitle());
+                    people.add(translateToEnglish(p.getTitle()));
+                    System.out.println("added person: " + translateToEnglish(p.getTitle()));
                     break;
                 default:
-                    System.out.println("Just a link: " + p.getTitle());
+                    System.out.println("Just a link: " + translateToEnglish(p.getTitle()));
             }
         }
         HashMap<String, Set> res = new HashMap<>();
@@ -74,6 +75,22 @@ public class PageProcessor {
         res.put("inst", institutions);
         res.put("ppl", people);
         return res;
+    }
+
+    private String translateToEnglish(String title) {
+        if(lang!=CrawledSource.WIKIENG){
+            String[] valuePairs = { "prop", "langlinks", "titles", title, "llcontinue", "9316|bar"};
+            Connector connector = new Connector();
+            String rawXmlResponse = connector.queryXML(user, valuePairs);
+            try {
+                Matcher m = Pattern.compile("<ll lang=\"als\" xml:space=\"preserve\">(.*?)</ll>").matcher(rawXmlResponse);
+                title = m.group(1).split("\\|")[0];
+            } catch (IllegalStateException e) {
+                // Gotcha!
+                System.err.println("Page without english version: "+title);
+            }
+        }
+        return title;
     }
 
     public String determinePageType(Page page){

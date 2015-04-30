@@ -89,7 +89,7 @@ public class InfoboxDataProcessor {
     }
 
     public String getFieldContent(String key, String result) {
-        if(result != ""){
+        if(result != "" || key==null){
             return result;
         }
         key = key.replace("[", "");
