@@ -1,8 +1,12 @@
 package pl.protka.wiki.en;
 
+import info.bliki.api.Connector;
 import info.bliki.api.Page;
 import info.bliki.api.User;
 import pl.protka.db.CrawledSource;
+import pl.protka.db.DatabaseDriver;
+import pl.protka.db.PersonEntity;
+
 import static pl.protka.wiki.en.CrawledField.*;
 
 import java.util.*;
@@ -95,6 +99,74 @@ class Crawler {
     }
 
     private void savePerson(Person person){
+        DatabaseDriver dbdriver = DatabaseDriver.getInstance();
+
+        PersonEntity pe = new PersonEntity();
+        pe.setName(person.name);
+        pe.setBirthDate(person.birthDate);
+        pe.setDeathDate(person.deathDate);
+        pe.setBirthPlace(person.birthPlace);
+        pe.setDeathPlace(person.deathPlace);
+        pe.setFields(person.fields);
+
+        int personId = dbdriver.savePerson(pe);
+
+        for (String related : person.relatedPeopleInf){
+            if (containsAllowed(related)) {
+                PersonEntity relatedPerson = new PersonEntity();
+                relatedPerson.setName(related);
+                int relatedId = dbdriver.savePerson(relatedPerson);
+                dbdriver.saveRelationFromBox(personId, relatedId);
+            }
+        }
+
+        for (String related : person.relatedPeopleTxt){
+            if (containsAllowed(related)) {
+                PersonEntity relatedPerson = new PersonEntity();
+                relatedPerson.setName(related);
+                int relatedId = dbdriver.savePerson(relatedPerson);
+                dbdriver.saveRelationFromText(personId, relatedId);
+            }
+        }
+        for (String name : person.institutionsInf){
+            if (containsAllowed(name))
+                dbdriver.saveUniFromBox(personId, name);
+        }
+        for (String name : person.institutionsTxt){
+            if (containsAllowed(name))
+                dbdriver.saveUniFromText(personId, name);
+        }
+        for (String name : person.countriesInf){
+            if (containsAllowed(name))
+                dbdriver.saveCountryFromBox(personId, name);
+        }
+        for (String name : person.countriesTxt){
+            if (containsAllowed(name))
+                dbdriver.saveCountryFromText(personId, name);
+        }
+        for (String name : person.citiesInf){
+            if (containsAllowed(name))
+                dbdriver.saveCityFromBox(personId, name);
+        }
+        for (String name : person.citiesTxt){
+            if (containsAllowed(name))
+                dbdriver.saveCityFromText(personId, name);
+        }
+
+
+        dbdriver.setCrawled(personId, lang);
+
+    }
+
+    private boolean containsAllowed(String value) {
+        if(value.contains("ikipedia")) {
+            return false;
+        }if(value.contains("Plik")) {
+            return false;
+        }if(value.contains("File")){
+                    return false;
+        }
+        return true;
 
     }
 
