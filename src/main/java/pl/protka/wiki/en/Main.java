@@ -13,6 +13,9 @@ public class Main {
 
     public static void main(String[] args) {
 
+//        StartingMathematicans sm = new StartingMathematicans();
+//        sm.prepareStartingDb();
+
         System.out.println("Starting crawler");
         List<String> listOfTiles = new ArrayList<>();
         listOfTiles.add("Albert Einstein");
