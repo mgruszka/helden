@@ -70,7 +70,7 @@ public class DatabaseDriver {
 
 		DatabaseDriver dbdriver = DatabaseDriver.getInstance();
 
-		PersonEntity pe = new PersonEntity();
+/*		PersonEntity pe = new PersonEntity();
 		pe.setName("Leonardo_da_Vinci");
 		pe.setBirthDate("2015-03-02");
 		pe.setDeathDate("2015-06-02");
@@ -79,10 +79,12 @@ public class DatabaseDriver {
 		pe.setFields("Economy, mathemathics");
 		
 		int id = dbdriver.savePerson(pe);
-		System.out.println("ID:" + id);		
+		System.out.println("ID:" + id);		*/
 		Map<Integer,String> lista = dbdriver.getPeople();		
 		System.out.println(lista);
 		
+		
+		dbdriver.setCrawled(17,CrawledSource.WIKIENG);
 		
 		//dbdriver.saveUniFromText(2, "university2");
 		
