@@ -80,14 +80,23 @@ public class DatabaseDriver {
 		
 		int id = dbdriver.savePerson(pe);
 		System.out.println("ID:" + id);		*/
-		Map<Integer,String> lista = dbdriver.getPeople();		
-		System.out.println(lista);
+		//Map<Integer,String> lista = dbdriver.getPeople();		
+		
+		//System.out.println(lista);
 		
 		
-		dbdriver.setCrawled(17,CrawledSource.WIKIENG);
+		//dbdriver.setCrawled(17,CrawledSource.WIKIENG);
 		
 		//dbdriver.saveUniFromText(2, "university2");
 		
+		PersonEntity person = dbdriver.getPersonEntity("Johann Euler");	
+		System.out.println(person.getID());
+		System.out.println(person.getName());
+		System.out.println(person.getBirthDate());
+		System.out.println(person.getBirthPlace());
+		System.out.println(person.getDeathDate());
+		System.out.println(person.getDeathPlace());
+		System.out.println(person.getFields());
 		dbdriver.close();
 
 	}
@@ -135,6 +144,37 @@ public class DatabaseDriver {
 		}
 		return names;
 
+	}
+	
+	
+	public PersonEntity getPersonEntity(String name){
+		
+		PersonEntity person = new PersonEntity();
+		person.setName(name);		
+		try {
+			PreparedStatement preparedStatement = conn
+					.prepareStatement("SELECT * FROM person where name like ?");
+			preparedStatement.setString(1, name);
+			System.out.println("Executing query for person: " + name);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			if (resultSet.next()) {
+				person.setID(resultSet.getInt("ID"));
+				person.setBirthDate(resultSet.getString("birth_date"));
+				person.setDeathDate(resultSet.getString("death_date"));
+				person.setBirthPlace(resultSet.getString("birth_place"));
+				person.setDeathPlace(resultSet.getString("death_place"));
+				person.setFields(resultSet.getString("fields"));
+				person.setBritURL(resultSet.getString("brit_url"));			
+			}
+		} catch (SQLException ex) {
+			// TODO Auto-generated catch block
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		
+		return person;
+		
 	}
 
 	
@@ -269,8 +309,8 @@ public class DatabaseDriver {
 		if (person.getFields() != null)
 			map.put("fields",person.getFields());
 		
-		if (person.getBirthURL() != null)
-			map.put("brit_url",person.getBirthURL());
+		if (person.getBritURL() != null)
+			map.put("brit_url",person.getBritURL());
 		
 		return map;
 	}

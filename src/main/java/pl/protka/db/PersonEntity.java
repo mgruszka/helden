@@ -9,7 +9,7 @@ public class PersonEntity {
 	private String birthPlace = null;
 	private String deathPlace = null;
 	private String fields = null;
-	private String birthURL = null;
+	private String britURL = null;
 	
 	public long getID() {
 		return ID;
@@ -53,11 +53,11 @@ public class PersonEntity {
 	public void setFields(String fields) {
 		this.fields = fields;
 	}
-	public String getBirthURL() {
-		return birthURL;
+	public String getBritURL() {
+		return britURL;
 	}
-	public void setBirthURL(String birthURL) {
-		this.birthURL = birthURL;
+	public void setBritURL(String britURL) {
+		this.britURL = britURL;
 	}
 
 	
