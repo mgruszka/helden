@@ -1,5 +1,7 @@
 package pl.protka.britanica;
 
+import java.io.IOException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,24 +14,15 @@ public class BritanicaURLBuilder {
 	private String queryURL = "http://www.britannica.com/search/ajax/autocomplete?nb=5&query=";
 
 	
-	public String getBritanicaURL(String name){
+	public String getBritanicaURL(String name) throws JSONException, IOException{
 				
-		String url = null;		
-		
+		String url = null;				
 		HTTPRequestManager http = new HTTPRequestManager();		
-		try {
-			String peparedQueryURL = queryURL + name.trim().replaceAll(" ", "+");			
-			String urlData = http.doGetMethod(peparedQueryURL);
-			String sufix = parseURLsufix(urlData);
-			url = "http://www.britannica.com" + sufix;
-			
-		} catch (JSONException e) {
-			System.out.println("Unable to obtain URL sufix for: " + name);
-			e.printStackTrace();				
-		} catch (Exception e) {
-			System.out.println("Unable to get URL data for: " + name);
-			e.printStackTrace();
-		}
+		String peparedQueryURL = queryURL + name.trim().replaceAll(" ", "+");		
+		System.out.println(peparedQueryURL);
+		String urlData = http.doGetMethod(peparedQueryURL);
+		String sufix = parseURLsufix(urlData);
+		url = "http://www.britannica.com" + sufix;
 		return url;
 			
 	}

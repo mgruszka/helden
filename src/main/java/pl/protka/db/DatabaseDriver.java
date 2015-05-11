@@ -89,7 +89,7 @@ public class DatabaseDriver {
 		
 		//dbdriver.saveUniFromText(2, "university2");
 		
-		PersonEntity person = dbdriver.getPersonEntity("Johann Euler");	
+		PersonEntity person = dbdriver.getPersonEntity("Robert Boyle");	
 		System.out.println(person.getID());
 		System.out.println(person.getName());
 		System.out.println(person.getBirthDate());
