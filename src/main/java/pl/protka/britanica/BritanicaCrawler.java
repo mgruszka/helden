@@ -115,9 +115,12 @@ public class BritanicaCrawler {
 		try {
 			String content = mgr.getPersonContent(name,url);
 			String born = getDateFromContent(content,"born");
+			if (born !=null)
+				p.setBirthDate(parseDate(born));
+			
 			String died = getDateFromContent(content,"died");
-			p.setBirthDate(parseDate(born));
-			p.setDeathDate(parseDate(died));
+			if (died != null)
+				p.setDeathDate(parseDate(died));
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -142,6 +145,10 @@ public class BritanicaCrawler {
 			try {
 				System.out.println("Processing " + name);
 				String url = brit.getBritanicaURL(name);
+				if (url == null){
+					System.out.println("Unable fetch url for: " + name + " . Skipping it.");
+					continue;
+				}
 				String body = getInfo(url);
 			
 				String infoBox = getInfoBox(body);

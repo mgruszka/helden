@@ -22,7 +22,8 @@ public class BritanicaURLBuilder {
 		System.out.println(peparedQueryURL);
 		String urlData = http.doGetMethod(peparedQueryURL);
 		String sufix = parseURLsufix(urlData);
-		url = "http://www.britannica.com" + sufix;
+		if (sufix != null)
+			url = "http://www.britannica.com" + sufix;
 		return url;
 			
 	}
@@ -30,9 +31,12 @@ public class BritanicaURLBuilder {
 	
 	private String parseURLsufix(String json) throws JSONException{
 		JSONArray array = new JSONArray(json);
-		JSONObject fieldsJson = (JSONObject) array.get(0);	
-		String ala = fieldsJson.getString("url");
-		return ala;
+		String result = null;
+		if (array.length() != 0){
+			JSONObject fieldsJson = (JSONObject) array.get(0);	
+			result = fieldsJson.getString("url");
+		}	
+		return result;
 	}
 		
 	
