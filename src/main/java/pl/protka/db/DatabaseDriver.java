@@ -332,9 +332,28 @@ public class DatabaseDriver {
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
 		}
-		
-		
+			
 	}
+	
+	public void setCrawledByName(String name, CrawledSource source){
+		
+		
+		String sql = "UPDATE person set " + source.dbFiled + " = 1 where name = ?";
+		PreparedStatement preparedStatement;
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setString(1, name);
+			preparedStatement.executeUpdate();
+			preparedStatement.close();
+			System.out.println("Successfully set " + source.dbFiled + " person: " + name);
+		} catch (SQLException ex) {
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+			
+	}	
+	
 	
 
 	public void saveCountryFromBox(int personID, String countryName){

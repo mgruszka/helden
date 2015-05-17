@@ -71,19 +71,22 @@ public class BritanicaCrawler {
 		Pattern p = Pattern.compile("<p>(.|\n)*?</p>");
 		Matcher m = p.matcher(infoBox);
 		
-		m.find();
-		String rawBirthDate = m.group(0);
+		if (m.find()){
+			String rawBirthDate = m.group(0);
+			String birthDate = parseDate(rawBirthDate.replace("<p>","").replace("</p>", "").trim());
+			person.setBirthDate(birthDate);
+		}
 		m.find();
 		//String rawBornPlace = m.group(0);	
-		m.find();
-		String rawDeathDate = m.group(0);
+		
+		if (m.find()){
+			String rawDeathDate = m.group(0);
+			String deathDate = parseDate(rawDeathDate.replace("<p>","").replace("</p>", "").trim());
+			person.setDeathDate(deathDate);
+		}
+		
 		m.find();
 		//String rawDeathPlace = m.group(0);
-		
-		String birthDate = parseDate(rawBirthDate.replace("<p>","").replace("</p>", "").trim());
-		String deathDate = parseDate(rawDeathDate.replace("<p>","").replace("</p>", "").trim());
-		person.setBirthDate(birthDate);
-		person.setDeathDate(deathDate);
 
 	}
 	
@@ -165,6 +168,7 @@ public class BritanicaCrawler {
 				}
 				
 				dbdriver.savePerson(p);
+				dbdriver.setCrawledByName(name, CrawledSource.BRITANICA);
 			} catch (IOException e) {
 				System.out.println("Unable to get URL data for: " + name);
 				e.printStackTrace();
