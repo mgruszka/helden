@@ -10,7 +10,7 @@
         </description>
         <display-name>helden</display-name>
         <servlet-name>helden</servlet-name>
-        <servlet-class>pl.protka.MainServlet</servlet-class>
+        <servlet-class>pl.protka.presentation.MainServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>helden</servlet-name>
