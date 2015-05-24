@@ -21,8 +21,9 @@ import java.util.List;
 
 @WebServlet(name = "helden")
 public class MainServlet extends HttpServlet {
-    static final DatabaseDriver dbdriver = DatabaseDriver.getInstance();
-    static List<String> list = new ArrayList<>(dbdriver.getPeople().values());
+    static DatabaseDriver dbdriver = DatabaseDriver.getInstance();
+    static PeopleList pl = new PeopleList();
+    static final String selects = pl.getDropdown();
 
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -45,7 +46,7 @@ public class MainServlet extends HttpServlet {
         CorrelationCounter cc = new CorrelationCounter();
         int factor = cc.correlate(right, left);
 
-        request.setAttribute("factor", "0");
+        request.setAttribute("factor", Integer.toString(factor));
         doGet(request, response);
     }
 
@@ -75,9 +76,11 @@ public class MainServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        request.setAttribute("heldenLeft", list);
+//        request.setAttribute("heldenLeft", list);
+//
+//        request.setAttribute("heldenRight", list);
 
-        request.setAttribute("heldenRight", list);
+        request.setAttribute("selects", selects);
 
         //Servlet JSP communication
         RequestDispatcher reqDispatcher = getServletConfig().getServletContext().getRequestDispatcher("/index.jsp");

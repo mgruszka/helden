@@ -50,17 +50,10 @@
         <div id="top">
 
             <form action="helden" method="post">
-                <select name="left">
-                    <c:forEach items="${heldenLeft}" var="heldenLeft">
-                        <option value="${heldenLeft}">${heldenLeft}</option>
-                    </c:forEach>
-                </select>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <select name="right">
-                    <c:forEach items="${heldenRight}" var="heldenRight">
-                        <option value="${heldenRight}">${heldenRight}</option>
-                    </c:forEach>
-                </select>
+                <%
+                    String selects = (String) request.getAttribute("selects");
+                    out.println(selects);
+                %>
                 <br/>
                 <br/>
                 <input type="Submit" value="New comparison">
