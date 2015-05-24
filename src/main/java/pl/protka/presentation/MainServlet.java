@@ -44,9 +44,9 @@ public class MainServlet extends HttpServlet {
         request.setAttribute("rightContent", rightContent);
 
         CorrelationCounter cc = new CorrelationCounter();
-        int factor = cc.correlate(right, left);
+        double factor = cc.correlate(right, left);
 
-        request.setAttribute("factor", Integer.toString(factor));
+        request.setAttribute("factor", Double.toString(factor));
         doGet(request, response);
     }
 
