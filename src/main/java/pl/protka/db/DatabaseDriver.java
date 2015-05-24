@@ -33,13 +33,15 @@ public class DatabaseDriver {
 	private DatabaseDriver() throws SQLException, InstantiationException,
 			IllegalAccessException, ClassNotFoundException {
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		
-		  conn = DriverManager
-		  .getConnection("jdbc:mysql://87.206.242.153/helden?" +
-		  "user=root&password=asus1234");
 
-/*		conn = DriverManager.getConnection("jdbc:mysql://10.0.0.4/helden?"
-				+ "user=root&password=asus1234");*/
+//		 conn = DriverManager
+//		 .getConnection("jdbc:mysql://87.206.242.153/helden?" +
+//		 "user=root&password=asus1234");
+
+
+
+		conn = DriverManager.getConnection("jdbc:mysql://10.0.0.4/helden?"
+				+ "user=root&password=asus1234");
 	}
 
 	public static DatabaseDriver getInstance() {
