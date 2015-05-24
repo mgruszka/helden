@@ -588,7 +588,7 @@ public class DatabaseDriver {
 	
 	public Map<Integer,String> getPeople() {
 
-		String sql = "SELECT ID,name from person where crowled_wiki_eng = 1 and fields like '%athematic%'";
+		String sql = "SELECT ID,name from person where crowled_brit = 1 and fields is not null";
 		PreparedStatement preparedStatement;
 		Map<Integer,String> people = new LinkedHashMap<Integer,String>();
 		try {
