@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -32,14 +33,13 @@ public class DatabaseDriver {
 	private DatabaseDriver() throws SQLException, InstantiationException,
 			IllegalAccessException, ClassNotFoundException {
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		/*
-		 * conn = DriverManager
-		 * .getConnection("jdbc:mysql://87.206.242.153/helden?" +
-		 * "user=root&password=asus1234");
-		 */
+		
+		  conn = DriverManager
+		  .getConnection("jdbc:mysql://87.206.242.153/helden?" +
+		  "user=root&password=asus1234");
 
-		conn = DriverManager.getConnection("jdbc:mysql://10.0.0.4/helden?"
-				+ "user=root&password=asus1234");
+/*		conn = DriverManager.getConnection("jdbc:mysql://10.0.0.4/helden?"
+				+ "user=root&password=asus1234");*/
 	}
 
 	public static DatabaseDriver getInstance() {
@@ -89,14 +89,17 @@ public class DatabaseDriver {
 		
 		//dbdriver.saveUniFromText(2, "university2");
 		
-		PersonEntity person = dbdriver.getPersonEntity("Robert Boyle");	
+		/*PersonEntity person = dbdriver.getPersonEntity("Robert Boyle");	
 		System.out.println(person.getID());
 		System.out.println(person.getName());
 		System.out.println(person.getBirthDate());
 		System.out.println(person.getBirthPlace());
 		System.out.println(person.getDeathDate());
 		System.out.println(person.getDeathPlace());
-		System.out.println(person.getFields());
+		System.out.println(person.getFields());*/
+		
+		System.out.println(dbdriver.getCitiesTextForPerson("Leonardo da Vinci"));
+		
 		dbdriver.close();
 
 	}
@@ -123,6 +126,104 @@ public class DatabaseDriver {
 	}
 
 
+	public List<String> getCitiesTextForPerson(String name){
+		return getForPerson(name,city_text_table);
+	}
+	
+	public List<String> getCitiesBoxForPerson(String name){
+		return getForPerson(name,city_box_table);
+	}
+	
+	public List<String> getUniBoxForPerson(String name){
+		return getForPerson(name,uni_box_table);
+	}
+	public List<String> getUniTextForPerson(String name){
+		return getForPerson(name,uni_text_table);
+	}
+	public List<String> getCountryBoxForPerson(String name){
+		return getForPerson(name,country_box_table);
+	}
+	public List<String> getCountryTextForPerson(String name){
+		return getForPerson(name,country_text_table);
+	}
+	
+	public boolean isBoxRelation(String name1, String name2){
+		return isRelation(name1,name2,relation_box_table);
+	}
+	
+	public boolean isTextRelation(String name1, String name2){
+		return isRelation(name1,name2,relation_text_table);
+	}
+	
+	
+	
+	private boolean isRelation(String name1, String name2, String tableName){
+		
+		int id1 = getPersonID(name1);
+		int id2 = getPersonID(name2);
+		String sql = "SELECT * from " + tableName + " where PERSON_ID = ? and PERSON_ID2 = ?";
+
+		int count = 0;
+		try {
+			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, id1);
+			preparedStatement.setInt(2, id2);	
+			System.out.println("Executing checking query: " + preparedStatement.toString());
+			ResultSet resultSet = preparedStatement.executeQuery();
+			
+			while (resultSet.next()) {
+				count ++;
+			}
+			preparedStatement.close();
+			
+			PreparedStatement preparedStatement2 = conn.prepareStatement(sql);
+			preparedStatement2.setInt(1, id2);
+			preparedStatement2.setInt(2, id1);	
+			System.out.println("Executing checking query: " + preparedStatement2.toString());
+			ResultSet resultSet2 = preparedStatement2.executeQuery();
+			
+			while (resultSet2.next()) {
+				count ++;
+			}
+			preparedStatement2.close();
+						
+			if (count > 0)
+				return true;
+		} catch (SQLException e) {
+			System.out.println("Unable to find relations: " + name1 + " and " + name2);
+			e.printStackTrace();
+		}
+	
+		return false;
+	}
+	
+	private List<String> getForPerson(String personName,String table){
+		
+		int id = getPersonID(personName);
+			
+		List<String> names = new LinkedList<String>();
+		try {
+			PreparedStatement preparedStatement = conn
+					.prepareStatement("SELECT name FROM " + table + " where PERSON_ID = ?");
+			preparedStatement.setInt(1, id);
+			System.out.println("Executing query for person: " + personName);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				String name = resultSet.getString("name");
+				names.add(name);
+			}
+			preparedStatement.close();
+		} catch (SQLException ex) {
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		return names;
+		
+	}
+	
+	
 	public List<String> getPeopleNotCrowled(CrawledSource source) {
 
 		String sql = "SELECT name from person where " + source.dbFiled + " = 0";
