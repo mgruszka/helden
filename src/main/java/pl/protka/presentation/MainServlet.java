@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by gruszek on 02.05.15.
@@ -22,20 +21,17 @@ import java.util.Random;
 
 @WebServlet(name = "helden")
 public class MainServlet extends HttpServlet {
-    static DatabaseDriver dbdriver = DatabaseDriver.getInstance();
+    static final DatabaseDriver dbdriver = DatabaseDriver.getInstance();
     static List<String> list = new ArrayList<>(dbdriver.getPeople().values());
 
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        DatabaseDriver dbdriver = DatabaseDriver.getInstance();
 
         String right = request.getParameter("right");
         String left = request.getParameter("left");
 
         PersonEntity leftPerson = dbdriver.getPersonEntity(left);
         PersonEntity rightPerson = dbdriver.getPersonEntity(right);
-        Random generator = new Random();
-        int i = generator.nextInt(100);
 
         request.setAttribute("left", left);
         request.setAttribute("right", right);
@@ -46,7 +42,10 @@ public class MainServlet extends HttpServlet {
         request.setAttribute("leftContent", leftContent);
         request.setAttribute("rightContent", rightContent);
 
-        request.setAttribute("factor", Integer.toString(i));
+        CorrelationCounter cc = new CorrelationCounter();
+        int factor = cc.correlate(right, left);
+
+        request.setAttribute("factor", "0");
         doGet(request, response);
     }
 
